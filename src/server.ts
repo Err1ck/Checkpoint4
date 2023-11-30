@@ -3,7 +3,7 @@ import "express-async-errors";
 import morgan from "morgan";
 
 const app = express();
-const port = 3000;
+const port = 4000;
 
 app.use(morgan("dev"));
 app.use(express.json());
@@ -61,6 +61,37 @@ let dbPathOfExile: PathOfExiles = [
     weapon: "Staves",
   },
 ];
+
+app.get("/pathofexile/:name", (req, res) => {
+  const { name } = req.params;
+  const path = dbPathOfExile.find((p) => p.name === String(name));
+  res.status(200).json(path);
+});
+
+app.post("/pathofexile/", (req, res) => {
+  const { id, name, type, weapon } = req.body;
+  const newCharacter = { id, name, type, weapon };
+  dbPathOfExile = [...dbPathOfExile, newCharacter];
+  res.status(201).json({ msg: "New Character was created" });
+
+  console.log(dbPathOfExile);
+});
+app.put("/pathofexile/:id", (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  dbPathOfExile = dbPathOfExile.map((t) =>
+    t.id === Number(id) ? { ...t, name } : t
+  );
+  res.status(200).json({ msg: "The Name was created" });
+  console.log(dbPathOfExile);
+});
+
+app.delete("/pathofexile/:id", (req, res) => {
+  const { id } = req.params;
+  dbPathOfExile = dbPathOfExile.filter((t) => t.id !== Number(id));
+  res.status(200).json({ msg: "The Character was deleted" });
+  console.log(dbPathOfExile);
+});
 
 app.listen(port, () => {
   console.log(`App listening on port http://localhost:${port}/pathofexile/`);
